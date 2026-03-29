@@ -20,6 +20,8 @@ quick-sharun \
 	./AppDir/bin/*        \
 	/usr/bin/init.lxc     \
 	/usr/bin/lxc-*        \
+	/usr/lib/lxc          \
+	/etc/lxc              \
 	/usr/lib/libgtk-3.so* \
 	/usr/share/dbus-1
 find ./AppDir/share/dbus-1 -type f ! -name '*waydro*' -delete
