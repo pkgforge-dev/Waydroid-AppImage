@@ -1,0 +1,24 @@
+#!/bin/sh
+
+_install_polkit_policy() (
+	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
+	rule_dst=/usr/local/share/polkit-1/actions/id.waydro.Container.policy
+
+	# for some reason we get permission denied error if we try to copy
+	# directly to the destination, so instead we have to fisrt copy to
+	# XDG_CACHE_HOME and then to the destination lol
+	tmpdir="${XDG_CACHE_HOME:-$HOME/.cache}"/temp-polkit
+
+	if [ ! -f "$rule_dst" ]; then
+		# remove anything funny that could be there
+		rm -rf "$tmpdir"
+		mkdir -p "$tmpdir"
+		cp -v "$rule_src" "$tmpdir"
+		pkexec /bin/sh -c "
+		  mkdir -p /usr/local/share/polkit-1/actions
+		  cp -v \"$tmpdir\"/id.waydro.Container.policy \"$rule_dst\"
+		"
+	fi
+)
+
+_install_polkit_policy || :
