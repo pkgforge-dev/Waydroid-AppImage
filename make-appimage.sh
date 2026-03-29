@@ -16,7 +16,8 @@ export DEPLOY_SYS_PYTHON=1
 mkdir -p ./AppDir/bin
 cp -r /usr/lib/waydroid/* ./AppDir/bin
 ln -s waydroid.py ./AppDir/bin/waydroid
-quick-sharun ./AppDir/bin/* /usr/lib/libgtk-3.so*
+quick-sharun ./AppDir/bin/* /usr/lib/libgtk-3.so* /usr/share/dbus-1
+find ./AppDir/share/dbus-1 -type f ! -name '*waydro*' -delete
 
 # add polkit policy file
 dst=./AppDir/share/polkit-1/actions
