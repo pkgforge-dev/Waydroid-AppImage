@@ -4,6 +4,12 @@ _install_polkit_policy() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
 	rule_dst=/usr/local/share/polkit-1/actions/id.waydro.Container.policy
 
+	dbus_src1="$APPDIR"/share/dbus-1/system-services/id.waydro.Container.service
+	dbus_dst1=/usr/local/share/dbus-1/system-services/id.waydro.Container.service
+
+	dbus_src2="$APPDIR"/share/dbus-1/system.d/id.waydro.Container.conf
+	dbus_dst2=/usr/local/share/dbus-1/system.d/id.waydro.Container.conf
+
 	# for some reason we get permission denied error if we try to copy
 	# directly to the destination, so instead we have to fisrt copy to
 	# XDG_CACHE_HOME and then to the destination lol
@@ -13,10 +19,16 @@ _install_polkit_policy() (
 		# remove anything funny that could be there
 		rm -rf "$tmpdir"
 		mkdir -p "$tmpdir"
-		cp -v "$rule_src" "$tmpdir"
+		cp -v "$rule_src"  "$tmpdir"
+		cp -v "$dbus_src1" "$tmpdir"
+		cp -v "$dbus_src2" "$tmpdir"
 		pkexec /bin/sh -c "
 		  mkdir -p /usr/local/share/polkit-1/actions
-		  cp -v \"$tmpdir\"/id.waydro.Container.policy \"$rule_dst\"
+		  mkdir -p /usr/local/share/dbus-1/system-services
+		  mkdir -p /usr/local/share/dbus-1/system.d
+		  cp -v \"$tmpdir\"/id.waydro.Container.policy  \"$rule_dst\"
+		  cp -v \"$tmpdir\"/id.waydro.Container.service \"$dbus_dst1\"
+		  cp -v \"$tmpdir\"/id.waydro.Container.conf    \"$dbus_dst2\"
 		"
 	fi
 )
