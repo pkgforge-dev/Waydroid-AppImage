@@ -18,7 +18,10 @@ cp -r /usr/lib/waydroid/* ./AppDir/bin
 ln -s waydroid.py ./AppDir/bin/waydroid
 quick-sharun ./AppDir/bin/* /usr/lib/libgtk-3.so*
 
-# Additional changes can be done in between here
+# add polkit policy file
+dst=./AppDir/share/polkit-1/actions
+mkdir -p "$dst"
+cp -v /usr/share/polkit-1/actions/id.waydro.Container.policy "$dst"
 
 # Turn AppDir into AppImage
 quick-sharun --make-appimage
