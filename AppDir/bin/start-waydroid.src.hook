@@ -1,4 +1,11 @@
-#!/bin/sh
+#!/bin/false
+
+_is_cmd() {
+	for cmd do
+		command -v "$cmd" 1>/dev/null || return 1
+	done
+	return 0
+}
 
 _install_polkit_policy() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
@@ -15,7 +22,7 @@ _install_polkit_policy() (
 	# XDG_CACHE_HOME and then to the destination lol
 	tmpdir="${XDG_CACHE_HOME:-$HOME/.cache}"/temp-polkit
 
-	if [ ! -f "$rule_dst" ] || [ ! -f "$dbus_dst2" ]; then		
+	if [ ! -f "$rule_dst" ] || [ ! -f "$dbus_dst2" ]; then
 		zenity --width=555 --question --text "$(cat <<-EOF
 		We need to install a few dbus and polkit files for this application to work
 		Normally we would place them in /usr/local/share, but for some reason it doesn't work
@@ -37,7 +44,7 @@ _install_polkit_policy() (
 		cp -v "$rule_src"  "$tmpdir"
 		cp -v "$dbus_src1" "$tmpdir"
 		cp -v "$dbus_src2" "$tmpdir"
-		pkexec /bin/sh -c "
+		$sudocmd /bin/sh -c "
 		  mkdir -p /usr/share/polkit-1/actions
 		  mkdir -p /usr/share/dbus-1/system-services
 		  mkdir -p /usr/share/dbus-1/system.d
@@ -48,4 +55,47 @@ _install_polkit_policy() (
 	fi
 )
 
+_start_12to11() {
+	case "$XDG_SESSION_TYPE" in
+		wayland|WAYLAND|Wayland)
+			:
+			;;
+		*)
+			if ! pgrep 12to11 1>/dev/null; then
+				>&2 echo "Starting 12to11..."
+				RENDERER=${RENDERER:-egl} 12to11 &
+			fi
+			;;
+	esac
+}
+
+_start_waydroid() {
+	if ! waydroid status | grep -qi 'Container:.*RUNNING'; then
+		$sudocmd waydroid container start &
+		sleep 1
+	fi
+	if ! waydroid status | grep -qi 'Session:.*RUNNING'; then
+		waydroid session start &
+		sleep 1
+	fi
+}
+
+if _is_cmd pkexec; then
+	sudocmd=pkexec
+elif _is_cmd lxqt-sudo; then
+	sudocmd=lxqt-sudo
+elif [ "$(id -u)" = 0 ]; then
+	sudocmd=""
+else
+	zenity --error --text "We need 'pkexec' or 'lxqt-sudo' to setup Waydroid"
+	zenity --info --text "You can also try to run the AppImage as root"
+	exit 1
+fi
+
 _install_polkit_policy || :
+_start_12to11
+_start_waydroid
+
+if [ -z "$1" ]; then
+	set -- show-full-ui
+fi
