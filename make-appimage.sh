@@ -18,6 +18,8 @@ cp -r /usr/lib/waydroid/* ./AppDir/bin
 ln -s waydroid.py ./AppDir/bin/waydroid
 quick-sharun \
 	./AppDir/bin/*            \
+	/usr/bin/nft              \
+	/usr/lib/libnftables.so*  \
 	/usr/bin/init.lxc         \
 	/usr/bin/lxc-*            \
 	/usr/lib/lxc              \
