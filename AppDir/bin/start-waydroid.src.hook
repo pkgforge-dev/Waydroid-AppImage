@@ -84,12 +84,40 @@ _start_12to11() {
 	esac
 }
 
-_start_waydroid() {
-	if ! waydroid status | grep -qi 'Container:.*RUNNING'; then
-		$sudocmd "$(command -v waydroid)" container start &
-		sleep 1
+_is_container_running() {
+	if waydroid status | grep -qi 'Container:.*RUNNING'; then
+		return 0
 	fi
+	return 1
+}
+
+_is_session_running() {
 	if ! waydroid status | grep -qi 'Session:.*RUNNING'; then
+		return 0
+	fi
+	return 1
+}
+
+_start_waydroid() {
+	if ! _is_container_running; then
+		$sudocmd "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid container start &
+	fi
+
+	# now we need to wait for the container to start
+	count=0
+	while :; do
+		if _is_container_running; then
+			break
+		fi
+		sleep 1
+		count=$(( count + 1 ))
+		if [ "$count" -gt 15 ]; then
+			zenity --width=250 --error --text "waydroid container failed to start!"
+			break
+		fi
+	done
+
+	if ! _is_session_running; then
 		waydroid session start &
 		sleep 1
 	fi
