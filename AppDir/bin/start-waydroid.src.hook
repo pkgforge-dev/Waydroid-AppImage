@@ -85,24 +85,17 @@ _start_12to11() {
 }
 
 _is_container_running() {
-	if waydroid status | grep -qi 'Container:.*RUNNING'; then
-		return 0
-	fi
-	return 1
+	waydroid status | grep -Eqi 'Container:.*(RUNNING|FROZEN)' || return 1
 }
 
 _is_session_running() {
-	if ! waydroid status | grep -qi 'Session:.*RUNNING'; then
-		return 0
-	fi
-	return 1
+	waydroid status | grep -qi 'Session:.*RUNNING' || return 1
 }
 
 _start_waydroid() {
 	if ! _is_container_running; then
 		$sudocmd "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid container start &
 	fi
-
 	# now we need to wait for the container to start
 	count=0
 	while :; do
@@ -116,7 +109,6 @@ _start_waydroid() {
 			break
 		fi
 	done
-
 	if ! _is_session_running; then
 		waydroid session start &
 		sleep 1
