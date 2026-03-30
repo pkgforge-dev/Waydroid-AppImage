@@ -87,10 +87,7 @@ _start_12to11() {
 # This can report NOTHING when the contaienr is actually running wtf
 # https://github.com/pkgforge-dev/Anylinux-AppImages/issues/421#issuecomment-4152351819
 _is_container_running() {
-	if ! waydroid status | grep -Eqi 'Container:.*(RUNNING|FROZEN)'; then
-		# if container is not in the output at all then assume it is running
-		waydroid status | grep -Eqi 'Container:' || return 0
-	fi
+	waydroid status | grep -Eqi 'Container:.*(RUNNING|FROZEN)' || return 1
 }
 
 _is_session_running() {
@@ -109,8 +106,14 @@ _start_waydroid() {
 		fi
 		sleep 1
 		count=$(( count + 1 ))
-		if [ "$count" -gt 15 ]; then
-			zenity --width=250 --error --text "waydroid container failed to start!"
+		if [ "$count" -gt 10 ]; then
+			zenity --error --width=350 --error --text "$(cat <<-EOF
+			waydroid container failed to start!
+
+			or maybe it did... I have no idea since 'waydroid status' is unreliable
+			and sometimes does not report anything about the container when it is running!
+			EOF
+			)"
 			break
 		fi
 	done
