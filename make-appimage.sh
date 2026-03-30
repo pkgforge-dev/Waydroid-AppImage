@@ -25,7 +25,8 @@ quick-sharun \
 	/usr/lib/libgtk-3.so*     \
 	/usr/lib/libgbinder.so*   \
 	/usr/lib/libglibutil.so*  \
-	/usr/share/dbus-1
+	/usr/share/dbus-1         \
+	/usr/bin/zenity
 find ./AppDir/share/dbus-1 -type f ! -name '*waydro*' -delete
 
 # add polkit policy file
