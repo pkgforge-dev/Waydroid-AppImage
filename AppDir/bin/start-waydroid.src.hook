@@ -86,7 +86,7 @@ _start_12to11() {
 
 _start_waydroid() {
 	if ! waydroid status | grep -qi 'Container:.*RUNNING'; then
-		$sudocmd waydroid container start &
+		$sudocmd "$(command -v waydroid)" container start &
 		sleep 1
 	fi
 	if ! waydroid status | grep -qi 'Session:.*RUNNING'; then
