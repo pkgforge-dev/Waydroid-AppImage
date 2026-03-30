@@ -15,7 +15,7 @@ _install_polkit_policy() (
 	# XDG_CACHE_HOME and then to the destination lol
 	tmpdir="${XDG_CACHE_HOME:-$HOME/.cache}"/temp-polkit
 
-	if [ ! -f "$rule_dst" ] || [ -f "$dbus_dst2" ]; then		
+	if [ ! -f "$rule_dst" ] || [ ! -f "$dbus_dst2" ]; then		
 		zenity --question --text "$(cat <<-EOF
 		We need to install a few dbus and polkit files for this application to work
 		Normally we would place them in /usr/local/share, but for some reason it doesn't work
