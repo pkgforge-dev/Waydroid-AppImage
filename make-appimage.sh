@@ -20,9 +20,11 @@ quick-sharun \
 	./AppDir/bin/*            \
 	/usr/bin/nft              \
 	/usr/lib/libnftables.so*  \
+	/usr/bin/dnsmasq          \
+	/usr/bin/pgrep            \
+	/usr/bin/12to11           \
 	/usr/bin/init.lxc         \
 	/usr/bin/lxc-*            \
-	/usr/bin/dnsmasq          \
 	/usr/lib/lxc              \
 	/etc/lxc                  \
 	/usr/lib/libgtk-3.so*     \
