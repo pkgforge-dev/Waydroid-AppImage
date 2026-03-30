@@ -84,12 +84,17 @@ _start_12to11() {
 	esac
 }
 
+# This can report NOTHING when the contaienr is actually running wtf
+# https://github.com/pkgforge-dev/Anylinux-AppImages/issues/421#issuecomment-4152351819
 _is_container_running() {
-	waydroid status | grep -Eqi 'Container:.*(RUNNING|FROZEN)' || return 1
+	if ! waydroid status | grep -Eqi 'Container:.*(RUNNING|FROZEN)'; then
+		# if container is not in the output at all then assume it is running
+		waydroid status | grep -Eqi 'Container:' || return 0
+	fi
 }
 
 _is_session_running() {
-	waydroid status | grep -qi 'Session:.*RUNNING' || return 1
+	waydroid status | grep -qi 'Session:.*(RUNNING|STOPPED)' || return 1
 }
 
 _start_waydroid() {
@@ -130,8 +135,8 @@ fi
 _check_kernel
 _install_polkit_policy || :
 _start_12to11
-_start_waydroid
 
 if [ -z "$1" ]; then
+	_start_waydroid
 	set -- show-full-ui
 fi
