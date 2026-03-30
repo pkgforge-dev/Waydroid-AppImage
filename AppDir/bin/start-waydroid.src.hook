@@ -113,7 +113,7 @@ _start_waydroid() {
 			or maybe it did... I have no idea since 'waydroid status' is unreliable
 			and sometimes does not report anything about the container when it is running!
 			EOF
-			)"
+			)" || :
 			break
 		fi
 	done
