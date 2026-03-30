@@ -22,6 +22,7 @@ quick-sharun \
 	/usr/lib/libnftables.so*  \
 	/usr/bin/init.lxc         \
 	/usr/bin/lxc-*            \
+	/usr/bin/dnsmasq          \
 	/usr/lib/lxc              \
 	/etc/lxc                  \
 	/usr/lib/libgtk-3.so*     \
