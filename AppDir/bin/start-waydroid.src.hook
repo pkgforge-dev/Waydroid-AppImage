@@ -7,6 +7,21 @@ _is_cmd() {
 	return 0
 }
 
+_check_kernel() (
+	f=/proc/config.gz
+	[ -r "$f" ] || return 0
+	if ! zcat "$f" | grep -q -m -1 'CONFIG_ANDROID_BINDER_IPC_RUST'; then
+		zenity --width=555 --warning --text "$(cat <<-EOF
+		Your kernel is missing the rust_binder module, which is needed by waydroid
+
+		You will need to either update your kernel or add it with DKMS
+
+		NOTE: If this is a false positive open an issue at the AppImage repository!
+		EOF
+		)"
+	fi
+)
+
 _install_polkit_policy() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
 	rule_dst=/usr/share/polkit-1/actions/id.waydro.Container.policy
@@ -92,6 +107,7 @@ else
 	exit 1
 fi
 
+_check_kernel
 _install_polkit_policy || :
 _start_12to11
 _start_waydroid
