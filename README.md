@@ -1,19 +1,21 @@
 <div align="center">
 
-# TEMPLATE-AppImage 🐧
+# Waydroid-AppImage 🐧
 
-[![GitHub Downloads](https://img.shields.io/github/downloads/pkgforge-dev/TEMPLATE-AppImage/total?logo=github&label=GitHub%20Downloads)](https://github.com/pkgforge-dev/TEMPLATE-AppImage/releases/latest)
-[![CI Build Status](https://github.com/pkgforge-dev/TEMPLATE-AppImage/actions/workflows/appimage.yml/badge.svg)](https://github.com/pkgforge-dev/TEMPLATE-AppImage/releases/latest)
-[![Latest Stable Release](https://img.shields.io/github/v/release/pkgforge-dev/TEMPLATE-AppImage)](https://github.com/pkgforge-dev/TEMPLATE-AppImage/releases/latest)
+[![GitHub Downloads](https://img.shields.io/github/downloads/pkgforge-dev/Waydroid-AppImage/total?logo=github&label=GitHub%20Downloads)](https://github.com/pkgforge-dev/Waydroid-AppImage/releases/latest)
+[![CI Build Status](https://github.com/pkgforge-dev/Waydroid-AppImage/actions/workflows/appimage.yml/badge.svg)](https://github.com/pkgforge-dev/Waydroid-AppImage/releases/latest)
+[![Latest Stable Release](https://img.shields.io/github/v/release/pkgforge-dev/Waydroid-AppImage)](https://github.com/pkgforge-dev/Waydroid-AppImage/releases/latest)
 
 <p align="center">
-  <img src="https://github.com/pkgforge-dev.png" width="128" />
+  <img src="https://raw.githubusercontent.com/waydroid/waydroid/refs/heads/main/data/AppIcon.png" width="128" />
 </p>
 
 
 | Latest Stable Release | Upstream URL |
 | :---: | :---: |
-| [Click here](https://github.com/pkgforge-dev/TEMPLATE-AppImage/releases/latest) | [Click here](https://github.com/pkgforge-dev/Anylinux-AppImages) |
+| [Click here](https://github.com/pkgforge-dev/Waydroid-AppImage/releases/latest) | [Click here](https://github.com/waydroid/waydroid) |
+
+**This AppImage is able to work on x11 automatically** Note that may not be the case if you happen to have the proprietary nvidia driver due to a bug in `12to11`
 
 </div>
 
