@@ -2,20 +2,35 @@
 
 _install_polkit_policy() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
-	rule_dst=/usr/local/share/polkit-1/actions/id.waydro.Container.policy
+	rule_dst=/usr/share/polkit-1/actions/id.waydro.Container.policy
 
 	dbus_src1="$APPDIR"/share/dbus-1/system-services/id.waydro.Container.service
-	dbus_dst1=/usr/local/share/dbus-1/system-services/id.waydro.Container.service
+	dbus_dst1=/usr/share/dbus-1/system-services/id.waydro.Container.service
 
 	dbus_src2="$APPDIR"/share/dbus-1/system.d/id.waydro.Container.conf
-	dbus_dst2=/usr/local/share/dbus-1/system.d/id.waydro.Container.conf
+	dbus_dst2=/usr/share/dbus-1/system.d/id.waydro.Container.conf
 
 	# for some reason we get permission denied error if we try to copy
 	# directly to the destination, so instead we have to fisrt copy to
 	# XDG_CACHE_HOME and then to the destination lol
 	tmpdir="${XDG_CACHE_HOME:-$HOME/.cache}"/temp-polkit
 
-	if [ ! -f "$rule_dst" ]; then
+	if [ ! -f "$rule_dst" ] || [ -f "$dbus_dst2" ]; then		
+		zenity --question --text "$(cat <<-EOF
+		We need to install a few dbus and polkit files for this application to work
+		Normally we would place them in /usr/local/share, but for some reason it doesn't work
+
+		So we will have to install the following files to /usr/share:
+
+		* $rule_dst
+		* $dbus_dst1
+		* $dbus_dst2
+
+		Be aware this will conflict with your package manager if you try to install waydroid with it!
+		In that case you will have to remove those files manually!
+		EOF
+		)" || return 1
+
 		# remove anything funny that could be there
 		rm -rf "$tmpdir"
 		mkdir -p "$tmpdir"
@@ -23,9 +38,9 @@ _install_polkit_policy() (
 		cp -v "$dbus_src1" "$tmpdir"
 		cp -v "$dbus_src2" "$tmpdir"
 		pkexec /bin/sh -c "
-		  mkdir -p /usr/local/share/polkit-1/actions
-		  mkdir -p /usr/local/share/dbus-1/system-services
-		  mkdir -p /usr/local/share/dbus-1/system.d
+		  mkdir -p /usr/share/polkit-1/actions
+		  mkdir -p /usr/share/dbus-1/system-services
+		  mkdir -p /usr/share/dbus-1/system.d
 		  cp -v \"$tmpdir\"/id.waydro.Container.policy  \"$rule_dst\"
 		  cp -v \"$tmpdir\"/id.waydro.Container.service \"$dbus_dst1\"
 		  cp -v \"$tmpdir\"/id.waydro.Container.conf    \"$dbus_dst2\"
