@@ -8,18 +8,22 @@ _is_cmd() {
 }
 
 _check_kernel() (
-	f=/proc/config.gz
-	[ -r "$f" ] || return 0
-	if ! zcat "$f" | grep -q -m -1 'CONFIG_ANDROID_BINDER_IPC_RUST'; then
-		zenity --width=555 --warning --text "$(cat <<-EOF
-		Your kernel is missing the rust_binder module, which is needed by waydroid
-
-		You will need to either update your kernel or add it with DKMS
-
-		NOTE: If this is a false positive open an issue at the AppImage repository!
-		EOF
-		)"
+	a=CONFIG_ANDROID_BINDER_IPC_RUST
+	if zcat /proc/config.gz | grep -q -m -1 "$a" ; then
+		return 0
+	elif grep -q -m 1 "$a" /usr/lib*/modules/*/build/.config; then
+		return 0
+	elif grep -q -m 1 "$a" /lib*/modules/*/build/.config; then
+		return 0
 	fi
+	zenity --width=555 --warning --text "$(cat <<-EOF
+	Your kernel is missing the rust_binder module, which is needed by waydroid
+
+	You will need to either update your kernel or add it with DKMS
+
+	NOTE: If this is a false positive open an issue at the AppImage repository!
+	EOF
+	)"
 )
 
 _get_sudo() {
