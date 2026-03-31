@@ -135,6 +135,15 @@ _install_polkit_policy || :
 _start_12to11
 
 if [ -z "$1" ]; then
+	if [ ! -d /var/lib/waydroid/images ]; then
+		_get_sudo
+		zenity --width=555 --question --text "$(cat <<-EOF
+		We need to download and install waydroid images, this will take a while
+		You might want run the application from the terminal to monitor progress
+		EOF
+		)"
+		"$sudocmd" "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid init
+	fi
 	_start_waydroid
 	set -- show-full-ui
 fi
