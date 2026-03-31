@@ -134,7 +134,7 @@ _start_waydroid() {
 	fi
 }
 
-_check_kernel
+#_check_kernel
 _install_polkit_policy || :
 _start_12to11
 
