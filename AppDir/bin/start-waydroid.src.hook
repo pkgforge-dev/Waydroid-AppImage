@@ -4,12 +4,11 @@ _run_outside_fuse() {
 	_rundir=${XDG_CACHE_HOME:-$HOME/.cache}/waydroid-AppImage
 	mkdir -p "$_rundir"/bin
 
-	ln -sfn "$APPDIR"/bin/data  "$_rundir"/bin
-	ln -sfn "$APPDIR"/bin/tools "$_rundir"/bin
+	cp -f "$APPDIR"/sharun        "$_rundir"
+	cp -f "$APPDIR"/bin/waydroid* "$_rundir"/bin
+	ln -sfn "$APPDIR"/bin/data    "$_rundir"/bin
+	ln -sfn "$APPDIR"/bin/tools   "$_rundir"/bin
 
-	cp "$APPDIR"/bin/waydroid*  "$_rundir"/bin
-
-	cp "$APPDIR"/sharun    "$_rundir"
 	cp "$APPDIR"/.env      "$_rundir" 2>/dev/null || :
 	cp "$APPDIR"/.preload  "$_rundir" 2>/dev/null || :
 
