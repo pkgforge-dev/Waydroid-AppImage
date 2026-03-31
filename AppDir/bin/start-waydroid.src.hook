@@ -22,6 +22,24 @@ _check_kernel() (
 	fi
 )
 
+_sudo_run() {
+	if _is_cmd pkexec; then
+		sudocmd=pkexec
+	elif _is_cmd lxqt-sudo; then
+		sudocmd=lxqt-sudo
+	elif [ -t 0 ]; then
+		if   _is_cmd sudo; then sudocmd=sudo
+		elif _is_cmd doas; then sudocmd=doas
+		else >&2 echo "ERROR: We need sudo or doas to start Waydroid!"; exit 1
+		fi
+	else
+		zenity --error --text "We need 'pkexec' or 'lxqt-sudo' to setup Waydroid"
+		zenity --info --text "Launch the AppImage from the terminal so we can prompt sudo/doas instead"
+		exit 1
+	fi
+	"$sudocmd" "$@"
+}
+
 _install_polkit_policy() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
 	rule_dst=/usr/share/polkit-1/actions/id.waydro.Container.policy
@@ -47,7 +65,7 @@ _install_polkit_policy() (
 		In that case you will have to remove those files manually!
 		EOF
 		)" || return 1
-		$sudocmd /bin/sh -c "
+		_sudo_run /bin/sh -c "
 		  mkdir -p /usr/share/polkit-1/actions
 		  mkdir -p /usr/share/dbus-1/system-services
 		  mkdir -p /usr/share/dbus-1/system.d
@@ -84,7 +102,7 @@ _is_session_running() {
 
 _start_waydroid() {
 	if ! _is_container_running; then
-		$sudocmd "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid container start &
+		_sudo_run "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid container start &
 	fi
 	# now we need to wait for the container to start
 	count=0
@@ -110,17 +128,6 @@ _start_waydroid() {
 		sleep 1
 	fi
 }
-
-if _is_cmd pkexec; then
-	sudocmd=pkexec
-elif _is_cmd lxqt-sudo; then
-	sudocmd=lxqt-sudo
-elif [ "$(id -u)" = 0 ]; then
-	sudocmd=""
-else
-	zenity --error --text "We need 'pkexec' or 'lxqt-sudo' to setup Waydroid"
-	exit 1
-fi
 
 _check_kernel
 _install_polkit_policy || :
