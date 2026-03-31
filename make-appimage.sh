@@ -31,16 +31,14 @@ quick-sharun \
 	/usr/lib/libgbinder.so*   \
 	/usr/lib/libglibutil.so*  \
 	/usr/share/dbus-1         \
+	/usr/share/polkit-1       \
 	/usr/bin/zenity
-find ./AppDir/share/dbus-1 -type f ! -name '*waydro*' -delete
-
-# add polkit policy file
-dst=./AppDir/share/polkit-1/actions
-mkdir -p "$dst"
-cp -v /usr/share/polkit-1/actions/id.waydro.Container.policy "$dst"
+find ./AppDir/share/dbus-1 ./AppDir/share/polkit-1 -type f ! -name '*waydro*' -delete
 
 # Turn AppDir into AppImage
-quick-sharun --make-appimage
+# disable FUSE since we run into limitations with actions that require elevated rights
+echo 'unset APPIMAGE_EXTRACT_AND_RUN' >> ./AppDir/.env
+ADD_PERMA_ENV_VARS='APPIMAGE_EXTRACT_AND_RUN=1' quick-sharun --make-appimage
 
 # Test the app for 12 seconds, if the test fails due to the app
 # having issues running in the CI use --simple-test instead

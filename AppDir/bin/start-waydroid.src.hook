@@ -1,41 +1,5 @@
 #!/bin/false
 
-_run_outside_fuse() {
-	_rundir=${XDG_CACHE_HOME:-$HOME/.cache}/waydroid-AppImage
-	mkdir -p "$_rundir"/bin
-
-	cp -f "$APPDIR"/sharun        "$_rundir"
-	cp -f "$APPDIR"/bin/waydroid* "$_rundir"/bin
-	ln -sfn "$APPDIR"/bin/data    "$_rundir"/bin
-	ln -sfn "$APPDIR"/bin/tools   "$_rundir"/bin
-
-	cp "$APPDIR"/.env      "$_rundir" 2>/dev/null || :
-	cp "$APPDIR"/.preload  "$_rundir" 2>/dev/null || :
-
-	for pybin in "$APPDIR"/bin/python*; do
-		case "$pybin" in
-			*config)
-				: # skip python config scripts
-				;;
-			*)
-				[ -f "$pybin" ] || continue
-				ln -f "$_rundir"/sharun "$_rundir"/bin/"${pybin##*/}"
-				;;
-		esac
-	done
-
-	ln -sfn "$APPDIR"/lib     "$_rundir"/lib
-	ln -sfn "$APPDIR"/share   "$_rundir"/share
-	ln -sfn "$APPDIR"/shared  "$_rundir"/shared
-	ln -sfn "$APPDIR"/etc     "$_rundir"/etc 2>/dev/null || :
-
-	PATH=$_rundir/bin:$PATH
-	# override APPDIR now so that the AppRun launches the right binaries
-	APPDIR=$_rundir
-
-	export PATH APPDIR
-}
-
 _is_cmd() {
 	for cmd do
 		command -v "$cmd" 1>/dev/null || return 1
@@ -159,7 +123,6 @@ else
 fi
 
 _check_kernel
-_run_outside_fuse
 _install_polkit_policy || :
 _start_12to11
 
