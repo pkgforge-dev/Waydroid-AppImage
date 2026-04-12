@@ -1,39 +1,13 @@
-#!/bin/false
+#!/bin/sh
 
-_is_cmd() {
-	for cmd do
-		command -v "$cmd" 1>/dev/null || return 1
-	done
-	return 0
-}
-
-_check_kernel() (
-	a=CONFIG_ANDROID_BINDER_IPC_RUST
-	if zcat /proc/config.gz | grep -q -m -1 "$a" ; then
-		return 0
-	elif grep -q -m 1 "$a" /usr/lib*/modules/*/build/.config; then
-		return 0
-	elif grep -q -m 1 "$a" /lib*/modules/*/build/.config; then
-		return 0
-	fi
-	zenity --width=555 --warning --text "$(cat <<-EOF
-	Your kernel is missing the rust_binder module, which is needed by waydroid
-
-	You will need to either update your kernel or add it with DKMS
-
-	NOTE: If this is a false positive open an issue at the AppImage repository!
-	EOF
-	)"
-)
-
-_get_sudo() {
-	if _is_cmd pkexec; then
+_get_sudocmd_waydroid() {
+	if is_cmd pkexec; then
 		sudocmd=pkexec
-	elif _is_cmd lxqt-sudo; then
+	elif is_cmd lxqt-sudo; then
 		sudocmd=lxqt-sudo
 	elif [ -t 0 ]; then
-		if   _is_cmd sudo; then sudocmd=sudo
-		elif _is_cmd doas; then sudocmd=doas
+		if   is_cmd sudo; then sudocmd=sudo
+		elif is_cmd doas; then sudocmd=doas
 		else >&2 echo "ERROR: We need sudo or doas to start Waydroid!"; exit 1
 		fi
 	else
@@ -43,7 +17,7 @@ _get_sudo() {
 	fi
 }
 
-_install_polkit_policy() (
+_install_polkit_policy_waydroid() (
 	rule_src="$APPDIR"/share/polkit-1/actions/id.waydro.Container.policy
 	rule_dst=/usr/share/polkit-1/actions/id.waydro.Container.policy
 
@@ -68,7 +42,7 @@ _install_polkit_policy() (
 		In that case you will have to remove those files manually!
 		EOF
 		)" || return 1
-		_get_sudo
+		_get_sudocmd_waydroid
 		"$sudocmd" /bin/sh -c "
 		  mkdir -p /usr/share/polkit-1/actions
 		  mkdir -p /usr/share/dbus-1/system-services
@@ -106,7 +80,7 @@ _is_session_running() {
 
 _start_waydroid() {
 	if ! _is_container_running; then
-		_get_sudo
+		_get_sudocmd_waydroid
 		"$sudocmd" "$APPDIR"/bin/python3 "$APPDIR"/bin/waydroid container start &
 	fi
 	# now we need to wait for the container to start
@@ -134,13 +108,12 @@ _start_waydroid() {
 	fi
 }
 
-#_check_kernel
-_install_polkit_policy || :
+_install_polkit_policy_waydroid || :
 _start_12to11
 
 if [ -z "$1" ]; then
 	if [ ! -d /var/lib/waydroid/images ]; then
-		_get_sudo
+		_get_sudocmd_waydroid
 		zenity --width=555 --question --text "$(cat <<-EOF
 		We need to download and install waydroid images, this will take a while
 		You might want run the application from the terminal to monitor progress
